@@ -1,0 +1,23 @@
+
+services:
+  websocket-agent:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./database.db:/app/database.db  # Mount the file directly
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+
+volumes:
+  redis_data:
+    driver: local

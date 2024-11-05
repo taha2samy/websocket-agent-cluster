@@ -1,2 +1,13 @@
 database.db
 *.db-journal
+*.txt
+*.png
+*.jpg
+*.aux
+*.pyc
+*.aux
+*.bbl
+*.fdb_latexmk
+*.fls
+*.log
+*.out

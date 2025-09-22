@@ -2,10 +2,11 @@ FROM registry.access.redhat.com/ubi9/python-311
 
 USER 0
 
-RUN dnf install -y dnf-utils zsh git curl wget && \
+RUN dnf install -y dnf-utils zsh git curl wget --allowerasing && \
     dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
     dnf install -y docker-ce-cli --nobest && \
     dnf clean all
+
 
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && \
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k

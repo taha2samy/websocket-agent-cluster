@@ -4,7 +4,7 @@ import json
 import xml.etree.ElementTree as ET
 import logging
 
-logger = logging.getLogger("WebSocketAgent")
+from handlers.logger import logger
 
 async def handle_message(message, allowed_tags, permissions, sender_id, config, redis_publisher):
     """Parses a client's message and publishes it to the appropriate Redis channels."""

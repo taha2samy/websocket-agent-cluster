@@ -4,7 +4,7 @@ import asyncio
 import json
 import logging
 
-logger = logging.getLogger("WebSocketAgent")
+from handlers.logger import logger
 
 async def redis_listener(websocket, sender_id, allowed_tags, permissions, config, redis_subscriber):
     """Listens on Redis PubSub channels and forwards messages to the WebSocket client."""

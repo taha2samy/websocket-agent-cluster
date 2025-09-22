@@ -9,3 +9,4 @@ database.db
 *.fls
 *.log
 *.out
+*Pipfile.lock

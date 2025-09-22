@@ -4,8 +4,8 @@ import asyncio
 import json
 import logging
 from redis.exceptions import ConnectionError
+from handlers.logger import logger
 
-logger = logging.getLogger("WebSocketAgent")
 
 async def commands_listener(config, active_connections, redis_client):
     """Listens on a Redis PubSub channel for server-wide commands."""

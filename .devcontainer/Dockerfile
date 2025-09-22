@@ -18,10 +18,13 @@ RUN sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="powerlevel10k\/powerlevel10k"/
     sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting docker)/' ~/.zshrc
 
 RUN pip3 install --no-cache-dir pipenv
-
 WORKDIR /workspace
 COPY Pipfile Pipfile.lock ./
-RUN pipenv install --system --deploy
+
+RUN pipenv install --system --deploy && \
+    cd "client/client flask" && \
+    pipenv install --deploy && \ 
+    cd ../..
 COPY . .
 
 CMD [ "zsh" ]

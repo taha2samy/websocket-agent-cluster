@@ -10,7 +10,7 @@ from handlers.redis_listener import redis_listener
 from handlers.message_handler import handle_message
 from handlers.notification_manager import publish_notification
 #from handlers.single_private_key_handler import validate_single_private_key
-logger = logging.getLogger("WebSocketAgent")
+from handlers.logger import logger
 
 async def manage_client_session(websocket, config, db_manager, active_connections, connection_id, redis_publisher, redis_subscriber):
     """

@@ -13,7 +13,7 @@ import logging
 import redis.asyncio as redis
 import redis as redis_main  # Imported for access to the library's exception classes
 
-logger = logging.getLogger("WebSocketAgent")
+from handlers.logger import logger
 
 
 async def create_redis_connection(redis_config: dict) -> redis.Redis:

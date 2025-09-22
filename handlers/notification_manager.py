@@ -4,7 +4,7 @@ import json
 import logging
 from redis.exceptions import ConnectionError
 
-logger = logging.getLogger("WebSocketAgent")
+from handlers.logger import logger
 
 async def publish_notification(notification, config, redis_publisher):
     """Publishes a notification message to the metadata/commands Redis channel."""

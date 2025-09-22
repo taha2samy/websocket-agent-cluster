@@ -5,7 +5,7 @@ import websockets
 from connection_manager import process_message
 from commands_listener import commands_listener
 from handlers.config import load_config
-logger = logging.getLogger("WebSocketAgent")
+from handlers.logger import logger
 
 async def main(config):
     async with websockets.serve(lambda ws, path: process_message(ws, path, config), config['server']['host'], config['server']['port']):

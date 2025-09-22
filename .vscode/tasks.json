@@ -5,11 +5,15 @@
       "label": "Docker: Rebuild & Restart Services",
       "detail": "Builds images from scratch and starts all services in the background.",
       "type": "shell",
+      "options": {
+        "statusbar": {"hide" : "true"}
+      },
       "command": "docker compose -f docker/docker-compose.yml build --no-cache && docker compose -f docker/docker-compose.yml up -d",
       "group": {
         "kind": "build",
         "isDefault": true
       },
+      
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -24,6 +28,9 @@
       "label": "Docker: Start Services",
       "detail": "Starts all services in the background using existing images.",
       "type": "shell",
+    "options": {
+        "statusbar": {"hide" : "true"}
+      },
       "command": "docker compose -f docker/docker-compose.yml up -d",
       "presentation": {
         "echo": true,
@@ -39,6 +46,9 @@
       "label": "Docker: Stop & Remove Services",
       "detail": "Stops and removes all containers, networks, and volumes.",
       "type": "shell",
+    "options": {
+        "statusbar": {"hide" : "true"}
+      },
       "command": "docker compose -f docker/docker-compose.yml down",
       "presentation": {
         "echo": true,
@@ -55,6 +65,9 @@
       "detail": "Follows the logs for all running services.",
       "type": "shell",
       "command": "docker compose -f docker/docker-compose.yml logs -f",
+    "options": {
+        "statusbar": {"hide" : "true"}
+      },
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -68,6 +81,9 @@
     {
         "label": "scripts: Load Tokens and Permissions into SQLite",
         "type": "shell",
+        "options": {
+        "statusbar": {"hide" : "true"}
+      },
         "detail": "load test token and permissions into SQLite database as test data to test the WebSocket server",
         "command": "pipenv run python ./scripts/expermintal_data_on_sqlite.py",
         "group": {
@@ -82,6 +98,31 @@
             "clear": true
         },
         "problemMatcher": []
+    },
+    {
+      "label": "Run WebSocket Server (Ask for Port)",
+      "type": "shell",
+      "detail": "Runs the WebSocket server, prompting for a port number.",
+      "command": "pipenv run flask run --port ${input:portNumber}",
+      "options": {
+        "statusbar": {"hide" : "true"},
+        "cwd": "${workspaceFolder}/client/client flask"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      },
+    }
+
+  ],
+  "inputs": [
+    {
+      "id": "portNumber",
+      "type": "promptString",
+      "description": "Please enter the port number for the WebSocket server.",
+      "default": "8000"
     }
   ]
 }

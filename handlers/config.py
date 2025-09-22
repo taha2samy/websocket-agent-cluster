@@ -3,6 +3,7 @@
 import configparser
 import json
 import logging
+from handlers.logger import logger
 
 def load_config(filename="config.conf"):
     config = configparser.ConfigParser()

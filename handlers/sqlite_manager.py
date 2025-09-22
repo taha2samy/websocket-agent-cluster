@@ -2,8 +2,7 @@ import sqlite3
 import os
 import json
 import logging
-
-logger = logging.getLogger("WebSocketAgent")
+from handlers.logger import logger
 
 class SQLiteManager:
     def __init__(self, db_path, user_table):

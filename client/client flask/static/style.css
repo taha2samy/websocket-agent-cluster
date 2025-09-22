@@ -1,0 +1,111 @@
+
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    padding: 20px;
+    background-color: #f0f2f5;
+    color: #333;
+}
+
+.container { 
+    max-width: 700px; 
+    margin: auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h2 {
+    text-align: center;
+    color: #1d2129;
+    margin-bottom: 20px;
+}
+
+.frame { 
+    border: 1px solid #dddfe2; 
+    border-radius: 8px; 
+    margin-bottom: 20px; 
+    padding: 20px; 
+}
+
+.frame h3 { 
+    margin-top: 0;
+    border-bottom: 1px solid #e9ebee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.form-grid { 
+    display: grid; 
+    grid-template-columns: 150px 1fr; 
+    gap: 12px; 
+    align-items: center; 
+}
+
+label {
+    font-weight: 600;
+}
+
+input[type="text"] { 
+    width: 100%; 
+    box-sizing: border-box; 
+    padding: 8px;
+    border: 1px solid #ccd0d5;
+    border-radius: 6px;
+}
+
+.button-group { 
+    display: flex; 
+    justify-content: space-between; 
+    margin-top: 15px; 
+}
+
+.button-group-right {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:disabled {
+    background-color: #e4e6eb;
+    color: #bcc0c4;
+    cursor: not-allowed;
+}
+
+#connectBtn {
+    background-color: #1877f2;
+    color: white;
+}
+#connectBtn:not(:disabled):hover {
+    background-color: #166fe5;
+}
+
+#disconnectBtn, #sendBtn {
+    background-color: #42b72a;
+    color: white;
+}
+#disconnectBtn:not(:disabled):hover, #sendBtn:not(:disabled):hover {
+    background-color: #36a420;
+}
+
+textarea { 
+    width: 100%; 
+    height: 200px; 
+    box-sizing: border-box; 
+    background-color: #f5f6f7; 
+    border: 1px solid #ccd0d5;
+    border-radius: 6px;
+    padding: 8px;
+    font-family: monospace;
+    resize: vertical;
+}

@@ -23,7 +23,7 @@ RUN pip3 install --no-cache-dir pipenv
 WORKDIR /workspace
 COPY . .
 RUN pipenv install --system --deploy && \
-    cd "flask_websocket_client" && \
+    cd "client/client flask" && \
     pipenv install --deploy && \
     cd ../..
 

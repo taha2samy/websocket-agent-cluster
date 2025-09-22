@@ -24,7 +24,7 @@ WORKDIR /workspace
 COPY . .
 RUN pipenv install --system --deploy && \
     cd "client/client flask" && \
-    pipenv install --deploy && \
+    pipenv install && \
     cd ../..
 
 

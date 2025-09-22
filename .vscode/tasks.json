@@ -5,7 +5,7 @@
       "label": "Docker: Rebuild & Restart Services",
       "detail": "Builds images from scratch and starts all services in the background.",
       "type": "shell",
-      "command": "docker-compose -f docker/docker-compose.yml build --no-cache && docker-compose -f docker/docker-compose.yml up -d",
+      "command": "docker compose -f docker/docker-compose.yml build --no-cache && docker compose -f docker/docker-compose.yml up -d",
       "group": {
         "kind": "build",
         "isDefault": true
@@ -24,7 +24,7 @@
       "label": "Docker: Start Services",
       "detail": "Starts all services in the background using existing images.",
       "type": "shell",
-      "command": "docker-compose -f docker/docker-compose.yml up -d",
+      "command": "docker compose -f docker/docker-compose.yml up -d",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -39,7 +39,7 @@
       "label": "Docker: Stop & Remove Services",
       "detail": "Stops and removes all containers, networks, and volumes.",
       "type": "shell",
-      "command": "docker-compose -f docker/docker-compose.yml down",
+      "command": "docker compose -f docker/docker-compose.yml down",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -54,7 +54,7 @@
       "label": "Docker: View Service Logs",
       "detail": "Follows the logs for all running services.",
       "type": "shell",
-      "command": "docker-compose -f docker/docker-compose.yml logs -f",
+      "command": "docker compose -f docker/docker-compose.yml logs -f",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -68,7 +68,7 @@
     {
         "label": "scripts: Load Tokens and Permissions into SQLite",
         "type": "shell",
-        "detail": "load test token and permissions into SQLite database as test data to test the WebSocket server", 
+        "detail": "load test token and permissions into SQLite database as test data to test the WebSocket server",
         "command": "pipenv run python ./scripts/expermintal_data_on_sqlite.py",
         "group": {
             "kind": "build",
@@ -83,6 +83,5 @@
         },
         "problemMatcher": []
     }
-
   ]
 }

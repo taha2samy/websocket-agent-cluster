@@ -2,17 +2,25 @@ FROM registry.access.redhat.com/ubi9/python-311
 
 USER 0
 
-RUN dnf install -y dnf-utils && \
+RUN dnf install -y dnf-utils zsh git curl wget && \
     dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
     dnf install -y docker-ce-cli --nobest && \
     dnf clean all
 
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && \
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k
+
+RUN git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
+RUN sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="powerlevel10k\/powerlevel10k"/' ~/.zshrc && \
+    sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting docker)/' ~/.zshrc
+
 RUN pip3 install --no-cache-dir pipenv
 
 WORKDIR /workspace
-
 COPY Pipfile Pipfile.lock ./
-
 RUN pipenv install --system --deploy
-
 COPY . .
+
+CMD [ "zsh" ]

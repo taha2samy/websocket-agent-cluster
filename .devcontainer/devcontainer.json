@@ -8,7 +8,14 @@
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
     ],
     "settings": {
-        "python.defaultInterpreterPath": "/usr/bin/python3"
+        "python.defaultInterpreterPath": "/usr/bin/python3",
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+            "zsh": {
+                "path": "/bin/zsh"
+            }
+        },
+        "terminal.integrated.fontFamily": "MesloLGS NF"
     },
     "extensions": [
         "ms-python.python",

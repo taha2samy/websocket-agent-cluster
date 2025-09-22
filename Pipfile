@@ -9,6 +9,7 @@ websockets = "*"
 setuptools = "*"
 redis = ">=4.2"
 cryptography = "*"
+click = "*"
 
 [dev-packages]
 

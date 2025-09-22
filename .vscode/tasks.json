@@ -24,6 +24,35 @@
       },
       "problemMatcher": []
     },
+        {
+      "label": "WebSocket Agent: Start Services",
+      "detail": "Start WebSocket Agent",
+      "type": "shell",
+      "options": {
+        "statusbar": {"hide" : "true"}
+      },
+      "command": "pipenv run python ./main.py runserver --port ${input:portNumber}",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+
+
+
+
+
+
     {
       "label": "Docker: Start Services",
       "detail": "Starts all services in the background using existing images.",

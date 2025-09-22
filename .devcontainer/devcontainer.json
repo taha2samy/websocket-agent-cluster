@@ -16,7 +16,8 @@
             }
         },
         "terminal.integrated.fontFamily": "MesloLGS NF",
-        "workbench.iconTheme": "material-icon-theme"
+        "workbench.iconTheme": "material-icon-theme",
+        "explorer.compactFolders": false
     },
     "extensions": [
         "ms-python.python",

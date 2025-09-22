@@ -11,6 +11,7 @@ from handlers.redis_client import create_redis_connection
 from handlers.connection_manager import manage_client_session
 from handlers.commands_listener import commands_listener
 from handlers.logger import logger
+import click
 class Server:
     def __init__(self, config, db_manager=None):
         self.active_connections = {}
@@ -54,14 +55,28 @@ class Server:
                 logger.info(f"Connection {connection_id} removed from active list. Total: {len(self.active_connections)}")
 
 if __name__ == "__main__":
-    config = load_config()
-    db_manager = None
-    if "sql" in config.get("mode", ""):
-        db_manager = SQLiteManager(config['database']['path'], config['database']['user_table'])
-    if "single_private_key" in config.get("mode", ""):
+    @click.group(help="WebSocket Server CLI - Manage and run the server")
+    def cli():
+        click.echo("WebSocket Server CLI")
         pass
-    server = Server(config, db_manager)
-    try:
-        asyncio.run(server.start())
-    except KeyboardInterrupt:
-        logger.info("Server shut down by user.")
+
+    @click.command(help="Start the WebSocket server")
+    @click.option("--port", type=int, help="Port to run the server on", default=None)
+    def runserver(port):
+        config = load_config()
+        if port:
+            config['port'] = port
+        db_manager = None
+        if "sql" in config.get("mode", ""):
+            db_manager = SQLiteManager(config['database']['path'], config['database']['user_table'])
+        if "single_private_key" in config.get("mode", ""):
+            pass
+        server = Server(config, db_manager)
+        try:
+            asyncio.run(server.start())
+        except KeyboardInterrupt:
+            logger.info("Server shut down by user.")
+
+        
+    cli.add_command(runserver)
+    cli()

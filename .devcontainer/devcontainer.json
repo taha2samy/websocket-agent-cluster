@@ -15,7 +15,8 @@
                 "path": "/bin/zsh"
             }
         },
-        "terminal.integrated.fontFamily": "MesloLGS NF"
+        "terminal.integrated.fontFamily": "MesloLGS NF",
+        "workbench.iconTheme": "material-icon-theme"
     },
     "extensions": [
         "ms-python.python",

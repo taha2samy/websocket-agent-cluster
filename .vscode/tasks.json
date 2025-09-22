@@ -108,6 +108,42 @@
       "problemMatcher": []
     },
     {
+      "label": "Docker: docker compose redis only up ",
+      "detail": "Follows the logs for all running services.",
+      "type": "shell",
+      "command": "docker compose -f 'docker/redis only/docker-compose.yml' -up -d",
+    "options": {
+        "statusbar": {"hide" : "true"}
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+        {
+      "label": "Docker: docker compose redis only down",
+      "detail": "Follows the logs for all running services.",
+      "type": "shell",
+      "command": "docker compose -f 'docker/redis only/docker-compose.yml' down",
+    "options": {
+        "statusbar": {"hide" : "true"}
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
         "label": "scripts: Load Tokens and Permissions into SQLite",
         "type": "shell",
         "options": {
@@ -129,9 +165,9 @@
         "problemMatcher": []
     },
     {
-      "label": "Run WebSocket Server (Ask for Port)",
+      "label": "Run WebSocket client (test) (Ask for Port)",
       "type": "shell",
-      "detail": "Runs the WebSocket server, prompting for a port number.",
+      "detail": "Runs the WebSocket client, prompting for a port number.",
       "command": "pipenv run flask run --port ${input:portNumber}",
       "options": {
         "statusbar": {"hide" : "true"},

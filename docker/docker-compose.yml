@@ -1,11 +1,10 @@
-
 services:
   websocket-agent:
     build:
-      context: .
-      dockerfile: docker/Dockerfile
+      context: ../
+      dockerfile: docker/dockerfile
     volumes:
-      - ./database.db:/app/database.db  # Mount the file directly
+      - ../database.db:/app/database.db
     ports:
       - "8000:8000"
     depends_on:

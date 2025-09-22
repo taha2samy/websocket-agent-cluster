@@ -1,0 +1,27 @@
+{
+    "name": "WebSocketAgent Dev Container",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+    "settings": {
+        "python.defaultInterpreterPath": "/usr/bin/python3"
+    },
+    "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "ZainChen.json",
+        "ms-vscode-remote.remote-containers",
+        "ms-azuretools.vscode-docker",
+        "docker.docker",
+        "PKief.material-icon-theme",
+        "ms-python.python",
+        "actboy168.tasks",
+        "augustocdias.tasks-shell-input",
+
+    ],
+    "remoteUser": "root"
+}

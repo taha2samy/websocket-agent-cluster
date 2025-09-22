@@ -4,10 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aioredis = "*"
 logger = "*"
 websockets = "*"
 setuptools = "*"
+redis = ">=4.2"
+cryptography = "*"
 
 [dev-packages]
 

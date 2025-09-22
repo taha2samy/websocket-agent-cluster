@@ -2,9 +2,9 @@
 import asyncio
 import logging
 import websockets
-from handlers.connection_manager import process_message
+from connection_manager import process_message
 from commands_listener import commands_listener
-from config import load_config
+from handlers.config import load_config
 logger = logging.getLogger("WebSocketAgent")
 
 async def main(config):

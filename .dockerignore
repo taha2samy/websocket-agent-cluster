@@ -2,12 +2,12 @@
 *.jpg
 *.png
 *.jpeg
-
+/img/
 # Exclude log files
 *.log
 
 # Exclude Pipfile and database files
-Pipfile
-Pipfile.lock
-database.db
+
+#database.db
 *.db-journal
+.vscode/

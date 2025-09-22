@@ -38,30 +38,3 @@ class SQLiteManager:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-    db_path = "test_database.db"
-    user_table = "user_tokens"
-
-    # Initialize the SQLiteManager
-    db_manager = SQLiteManager(db_path, user_table)
-
-    # Test inserting a token and checking it
-    test_token = "test_token"
-    test_permissions = json.dumps({
-        "tag1": {"send": True, "receive": True},
-        "tag2": {"send": False, "receive": True}
-    })
-
-    # Insert test data into the database
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute(f"INSERT INTO {user_table} (token, permissions) VALUES (?, ?)", (test_token, test_permissions))
-    conn.commit()
-    conn.close()
-
-    # Now check if we can retrieve the permissions for the test token
-    permissions = db_manager.check_token(test_token)
-    if permissions:
-        logger.info(f"Permissions for token '{test_token}': {permissions}")
-    else:
-        logger.warning(f"Token '{test_token}' not found in the database.")

@@ -1,75 +1,88 @@
 # handlers/connection_manager.py
+
 import asyncio
 import logging
 import uuid
+import websockets
 from datetime import datetime
-from redis_client import create_redis_connection
+
 from handlers.redis_listener import redis_listener
 from handlers.message_handler import handle_message
 from handlers.notification_manager import publish_notification
-
+#from handlers.single_private_key_handler import validate_single_private_key
 logger = logging.getLogger("WebSocketAgent")
 
-async def process_message(websocket, path, config, db_manager=None):
+async def manage_client_session(websocket, config, db_manager, active_connections, connection_id, redis_publisher, redis_subscriber):
+    """
+    Handles the entire lifecycle of a single client connection, from authentication to disconnection.
+    """
     headers = websocket.request_headers
     token = headers.get("Authorization")
 
-    # Determine token validation mode
-    if 'tokens' in config and config['tokens']:
+    # --- Authentication Logic ---
+    token_data = None
+    if config['mode'] == 'config':
         token_data = config['tokens'].get(token)
-        if not token_data:
-            await websocket.close(code=4001, reason="Unauthorized")
-            logger.warning("Unauthorized access attempt with token: %s", token)
-            return
-    elif db_manager:
+    elif config['mode'] == 'sql' and db_manager:
         token_data = db_manager.check_token(token)
-        if token_data is None:
-            await websocket.close(code=4001, reason="Unauthorized")
-            logger.warning("Unauthorized access attempt with token: %s", token)
-            return
-    else:
-        await websocket.close(code=4001, reason="No token provider configured")
+    elif config['mode'] == 'single_private_key':
+        pass
+    if not token_data:
+        await websocket.close(code=4001, reason="Unauthorized")
+        logger.warning(f"Unauthorized access attempt with token: {token} from {websocket.remote_address[0]}")
         return
-    allowed_tags = token_data["tags"]
-    permissions = token_data["permissions"]
-    sender_id = str(uuid.uuid4())
-    ip_address_my = websocket.remote_address[0]
-    user_agent = headers.get("User-Agent")
-    ip_address, port = websocket.remote_address
+
+    allowed_tags = token_data.get("tags", [])
+    permissions = token_data.get("permissions", {})
+
+    # --- Add connection to the shared active_connections dictionary ---
+    active_connections[connection_id] = {
+        "websocket": websocket,
+        "token": token,
+        "tags": allowed_tags,
+        "permissions": permissions,
+        "ip": websocket.remote_address[0]
+    }
+    logger.info(f"Connection {connection_id} authenticated and registered. Total active: {len(active_connections)}")
+
+    # --- Publish connection notification ---
     metadata = {
-        "port": port,
-        "client_ip_address": ip_address,
-        "my_ip_address": ip_address_my,
-        "user_agent": user_agent,
+        "port": websocket.remote_address[1],
+        "client_ip_address": websocket.remote_address[0],
+        "user_agent": headers.get("User-Agent"),
         "timestamp": datetime.utcnow().isoformat()
     }
-
     connection_notification = {
         "action": "connection_status",
         "token": token,
-        "uuid": sender_id,
+        "uuid": connection_id,
         "status": "accepted",
         "metadata": metadata
     }
-    await publish_notification(connection_notification, config)
+    await publish_notification(connection_notification, config, redis_publisher)
 
-    client_redis = await create_redis_connection(config['redis'])
-    listener_task = asyncio.create_task(redis_listener(websocket, sender_id, allowed_tags, permissions, config))
+    # --- Start the Redis listener for this client ---
+    listener_task = asyncio.create_task(
+        redis_listener(websocket, connection_id, allowed_tags, permissions, config, redis_subscriber)
+    )
 
     try:
+        # --- Main loop to handle incoming messages from this client ---
         async for message in websocket:
-            await handle_message(message, websocket, client_redis, allowed_tags, permissions, sender_id, config)
+            await handle_message(message, allowed_tags, permissions, connection_id, config, redis_publisher)
     except websockets.ConnectionClosedError:
-        logger.info("Connection closed by client")
+        logger.info(f"Connection {connection_id} closed by client.")
+    except Exception as e:
+        logger.error(f"Error during client session for {connection_id}: {e}", exc_info=True)
     finally:
         listener_task.cancel()
-        await client_redis.close()
-        logger.info("Client Redis connection closed")
+        logger.info(f"Client session ended for {connection_id}.")
+        # --- Publish disconnection notification ---
         disconnection_notification = {
             "action": "connection_status",
             "token": token,
-            "uuid": sender_id,
+            "uuid": connection_id,
             "status": "closed",
             "metadata": metadata
         }
-        await publish_notification(disconnection_notification, config)
+        await publish_notification(disconnection_notification, config, redis_publisher)

@@ -1,0 +1,30 @@
+
+
+
+{
+    "tests_data":[
+
+    {
+        "token": "test_token",
+        "permissions": {
+            "tag1": {"send": true, "receive": true},
+            "tag2": {"send": false, "receive": true}
+        }
+    },
+    {
+        "token": "test_token_1",
+        "permissions": {
+            "tag1": {"send": true, "receive": true},
+            "tag2": {"send": false, "receive": true}
+        }
+    },
+    {
+        "token": "test_token_2",
+        "permissions": {
+            "tag1": {"send": true, "receive": true},
+            "tag2": {"send": false, "receive": true}
+        }
+    }
+    
+]
+}

@@ -33,12 +33,15 @@ class AuthMiddlewareBroker(BaseMiddleware):
         if max_connections > 0:
             safe_token = sanitize_tag(token_str)
             cache_key = f"connections:{safe_token}"
-            current_connections = cache.get(cache_key, 0)
             
-            if current_connections >= max_connections:
+            connection_count = cache.incr(cache_key, 1)
+
+            if connection_count > max_connections:
+                cache.decr(cache_key, 1)
+                
                 logger.warning(
                     "Connection rejected for token %s: Connection limit reached (%s/%s)",
-                    token_str, current_connections, max_connections
+                    token_str, connection_count - 1, max_connections
                 )
                 await send({"type": "websocket.close", "code": 4004})
                 return

@@ -74,8 +74,7 @@ def tag_deleted(sender, instance, **kwargs):
     notify_tag_change(instance.prefix)
 
 @receiver(post_save, sender=BrokerTags)
-def tag_updated(sender, instance, **kwargs):
-    old_prefix = getattr(instance, "_old_prefix", None)
-    if old_prefix and old_prefix != instance.prefix:
-        logger.info("Tag pattern updated from '%s' to '%s'.", old_prefix, instance.prefix)
-        notify_tag_change(old_prefix)
+def tag_updated(sender, instance, created, **kwargs):
+    if not created and instance._old_prefix != instance.prefix:
+        logger.info("Tag pattern updated from '%s' to '%s'.", instance._old_prefix, instance.prefix)
+        notify_tag_change(instance._old_prefix)

@@ -36,24 +36,16 @@ class BrokerPermission(models.Model):
 
 class BrokerTags(models.Model):
     prefix = models.TextField(unique=True)
+    _old_prefix = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._old_prefix = self.prefix
 
     def __str__(self):
         return self.prefix
 
-    def save(self, *args, **kwargs):
-        if self.pk:
-            old = BrokerTags.objects.get(pk=self.pk)
-            old_prefix = old.prefix
-            if old_prefix != self.prefix:
-                old.delete()
-        super().save(*args, **kwargs)
-
-
     def clean(self):
-        """
-        Ensure that the new prefix does not conflict or overlap with existing prefixes,
-        using MQTT pattern matching with wildcards.
-        """
         matcher = MqttPatternMatcher()
         existing_prefixes = BrokerTags.objects.exclude(id=self.id).values_list('prefix', flat=True)
 
@@ -62,5 +54,6 @@ class BrokerTags(models.Model):
                 raise ValidationError(f"Prefix '{self.prefix}' conflicts or overlaps with existing prefix '{ep}'")
 
     def save(self, *args, **kwargs):
-        self.full_clean()  # This will call clean() before saving
+        self.full_clean()
         super().save(*args, **kwargs)
+        self._old_prefix = self.prefix

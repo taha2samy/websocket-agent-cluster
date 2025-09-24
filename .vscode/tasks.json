@@ -11,6 +11,88 @@
                 "panel": "new"
             }
         },
+        {
+            "label": "Packages: extract",
+            "type": "shell",
+            "command": "pipenv run pip freeze > requirements.txt",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+            {
+                "label": "Docker: Run Compose (Detached)",
+                "type": "shell",
+                "command": "docker-compose -f docker/docker-compose.yaml up -d --build",
+                "group": "build",
+                "presentation": {
+                    "reveal": "never",
+                    "panel": "shared",
+                    "focus": false,
+                    "showReuseMessage": false
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "Docker: Stop Compose",
+                "type": "shell",
+                "command": "docker-compose -f docker/docker-compose.yaml down",
+                "group": "build",
+                "presentation": {
+                    "reveal": "never",
+                    "panel": "shared",
+                    "focus": false,
+                    "showReuseMessage": false
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "Docker: build",
+                "type": "shell",
+                "command": "docker build -f docker/dockerfile -t taha2samy/mybrocker:${input:userText} ./.",
+                "group": "build",
+                "presentation": {
+                    "reveal": "never",
+                    "panel": "dedicated",
+                    "focus": false,
+                    "showReuseMessage": false
+                },
+                "problemMatcher": []
+            },
+                    {
+            "label": "Docker:$(package) Push Selected Image",
+            "type": "shell",
+            "command": "sudo docker push ${input:selectedImage}",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false
+            },
+            "problemMatcher": []
+        }
+
         
+    ],
+    "inputs": [
+        {
+            "id": "userText",
+            "type": "promptString",
+            "description": "Type something:",
+            "default": "v1"
+        },
+{
+    "id": "selectedImage",
+    "type": "command",
+    "command": "shellCommand.execute",
+    "args": {
+        "command": "docker images --format '{{.Repository}}:{{.Tag}}|{{.Repository}}:{{.Tag}}|{{.Size}}|{{.CreatedSince}}'",
+        "fieldSeparator": "|",
+        "description": "Select the image to push"
+    }
+}
+
     ]
 }

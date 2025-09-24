@@ -9,7 +9,12 @@ channels = "*"
 uvicorn = "*"
 daphne = "*"
 tk = "*"
-pyqt4 = "*"
+pyqt5 = "*"
+redis = "*"
+psycopg = "*"
+django-redis = "*"
+psycopg2-binary = "*"
+whitenoise = "*"
 
 [dev-packages]
 

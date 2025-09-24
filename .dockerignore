@@ -11,3 +11,6 @@
 #database.db
 *.db-journal
 .vscode/
+.devcontainer/
+client/
+db.sqlite3

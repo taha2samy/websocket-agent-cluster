@@ -39,7 +39,9 @@ jobs:
   docker-build-push:
     needs: build-test
     runs-on: ubuntu-latest
-    environment: export docker
+    environment:
+        name: export docker
+        url: https://hub.docker.com/repository/docker/taha2samy/mybrocker
     outputs:
       result: ${{ job.status }}
       image_tag: ${{ steps.docker_tag.outputs.tag }}
@@ -68,7 +70,7 @@ jobs:
           context: .
           file: ./docker/dockerfile
           push: true
-          tags: mydockerhubuser/myapp:${{ steps.docker_tag.outputs.tag }}
+          tags: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}
 
   generate-summary:
     needs: [build-test, docker-build-push]

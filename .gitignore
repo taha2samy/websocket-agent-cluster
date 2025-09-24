@@ -11,3 +11,5 @@ database.db
 /staticfiles/*
 *mad.sh
 *all.txt
+__pycache__/
+media/

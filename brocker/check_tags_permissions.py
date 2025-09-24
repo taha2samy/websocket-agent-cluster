@@ -1,4 +1,4 @@
-from .async_helpers import get_broker_token, get_permissions, matcher
+from brocker.async_helpers import get_broker_token, get_permissions, matcher
 
 async def check_tags_permissions(token_str, tags_str):
     """

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 def sanitize_tag(tag):
     tag = str(tag)
-    tag = re.sub(r'[^0--9a-zA-Z\-\._]', '_', tag)
+    tag = re.sub(r'[^0-9a-zA-Z\-\._]', '_', tag)
     return tag[:100]
 
 class BrokerConsumer(AsyncWebsocketConsumer):

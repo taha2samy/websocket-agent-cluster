@@ -1,6 +1,4 @@
 
-### `docs/1-introduction.md`
-
 # 1. Introduction
 
 Welcome to the official documentation for the Django Real-Time Broker. This project provides a high-performance, secure, and dynamic messaging system for real-time applications.

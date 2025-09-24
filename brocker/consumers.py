@@ -15,7 +15,11 @@ def sanitize_tag(tag):
 class BrokerConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
-        print("Client connected:", self.scope)
+        logger.info(
+            "Client connected: path=%s, user=%s",
+            self.scope.get("path"),
+            self.scope.get("user")
+        )
         token = self.scope.get("token")
         max_connections = self.scope.get("max_connections", 0)
 

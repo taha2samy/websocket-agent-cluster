@@ -16,6 +16,7 @@ django-redis = "*"
 psycopg2-binary = "*"
 whitenoise = "*"
 logger = "*"
+channels-redis = "*"
 
 [dev-packages]
 

@@ -34,10 +34,10 @@
             "console": "integratedTerminal",
         },
                 {
-            "name": "Client: tkinter client",
+            "name": "Client: PyQt client",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/client/tkinter/main.py",
+            "program": "${workspaceFolder}/client/pyqt5/main.py",
             "console": "integratedTerminal",
             "python": "/home/Taha/.pyenv/shims/python"
         },

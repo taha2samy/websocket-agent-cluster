@@ -1,0 +1,104 @@
+name: Django Brocker CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag to build and push (e.g., v1.0.0)'
+        required: true
+        default: 'latest'
+        type: string
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ job.status }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Django tests
+        run: |
+          python manage.py migrate
+          python manage.py test
+
+  docker-build-push:
+    needs: build-test
+    runs-on: ubuntu-latest
+    Environment: export docker
+    outputs:
+      result: ${{ job.status }}
+      image_tag: ${{ steps.docker_tag.outputs.tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Determine Docker tag
+        id: docker_tag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./docker/dockerfile
+          push: true
+          tags: mydockerhubuser/myapp:${{ steps.docker_tag.outputs.tag }}
+
+  generate-summary:
+    needs: [build-test, docker-build-push]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Generate Run Summary
+        run: |
+          echo "## 🚀 CI/CD Run Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🧪 Testing Stage (build-test)" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.build-test.outputs.result }}" == "success" ]]; then
+            echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Status:** ❌ Failure" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "### 🐳 Docker Build & Push Stage" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.docker-build-push.outputs.result }}" == "success" ]]; then
+            echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
+            echo "- **Image:** \`mydockerhubuser/myapp:${{ needs.docker-build-push.outputs.image_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.docker-build-push.outputs.result }}" == "failure" ]]; then
+            echo "- **Status:** ❌ Failure" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Status:** ❔ Skipped (due to test failure)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "Workflow triggered by **${{ github.actor }}** via **${{ github.event_name }}** event." >> $GITHUB_STEP_SUMMARY
+          echo "You can view the full run details [here](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})." >> $GITHUB_STEP_SUMMARY

@@ -14,3 +14,4 @@
 .devcontainer/
 client/
 db.sqlite3
+.github/

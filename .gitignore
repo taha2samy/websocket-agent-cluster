@@ -1,6 +1,5 @@
 database.db
 *.db-journal
-*.txt
 *.aux
 *.pyc
 *.aux

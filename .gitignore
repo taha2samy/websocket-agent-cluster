@@ -9,3 +9,5 @@ database.db
 *.fls
 *.log
 *.out
+/staticfiles/*
+

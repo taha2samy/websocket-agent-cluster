@@ -23,9 +23,8 @@ RUN pip3 install --no-cache-dir pipenv
 WORKDIR /workspace
 COPY . .
 RUN pipenv install --system --deploy && \
-    cd "client/client flask" && \
-    pipenv install && \
-    cd ../..
+    mkdir -p /workspace/staticfiles && \
+    python3 manage.py collectstatic --noinput -v 0
 
 
 CMD [ "zsh" ]

@@ -39,7 +39,7 @@ jobs:
   docker-build-push:
     needs: build-test
     runs-on: ubuntu-latest
-    Environment: export docker
+    environment: export docker
     outputs:
       result: ${{ job.status }}
       image_tag: ${{ steps.docker_tag.outputs.tag }}

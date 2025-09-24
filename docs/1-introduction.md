@@ -12,8 +12,8 @@ At its core, the project acts as a central, secure broker that manages the flow 
 ```mermaid
 graph LR
     subgraph "Clients"
-        Publisher[IoT Device / Web App<br/>(Publisher)]
-        Subscriber[Dashboard / Mobile App<br/>(Subscriber)]
+        Publisher[IoT Device / Web App<br/>Publisher]
+        Subscriber[Dashboard / Mobile App<br/>Subscriber]
     end
 
     subgraph "Django Real-Time Broker"

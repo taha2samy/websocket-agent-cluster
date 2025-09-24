@@ -1,10 +1,4 @@
 # Exclude image files
-*.jpg
-*.png
-*.jpeg
-/img/
-# Exclude log files
-*.log
 
 # Exclude Pipfile and database files
 

@@ -18,7 +18,7 @@ services:
       - "6379:6379"
 
   web:
-    image: taha2samy/mybrocker:4.0.1
+    image: taha2samy/mybrocker:4.0.2
     command: sh -c "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 myproject.asgi:application"
     env_file:
       - ./.env

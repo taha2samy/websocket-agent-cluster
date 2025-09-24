@@ -71,6 +71,10 @@ jobs:
           file: ./docker/dockerfile
           push: true
           tags: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}
+      - name: Verify Docker image
+        run: |
+          echo "Verifying Docker image..."
+          ls -la
 
   generate-summary:
     needs: [build-test, docker-build-push]

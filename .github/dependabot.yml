@@ -8,6 +8,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    
+    exclude-paths:
+      - "Pipfile"
+      - "Pipfile.lock"
+      
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major"] 
+        update-types: ["version-update:semver-major"]

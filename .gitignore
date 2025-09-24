@@ -9,4 +9,5 @@ database.db
 *.log
 *.out
 /staticfiles/*
-
+*mad.sh
+*all.txt

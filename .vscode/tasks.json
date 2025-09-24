@@ -1,98 +1,82 @@
 {
     "version": "2.0.0",
     "tasks": [
+        // =================================================================
+        // DOCKER WORKFLOW
+        // =================================================================
         {
-            "label": "client: pyqt",
+            "label": "$(play-circle) Docker: Start Compose Services",
             "type": "shell",
-            "command": "python client/tkinter/main.py",
+            "command": "docker-compose -f docker/docker-compose.yaml up -d --build",
+            "detail": "Builds and starts all Docker services in detached mode.",
             "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
+            "options": {"statusbar": {"hide": true}},
+            "presentation": { "reveal": "never" }
         },
         {
-            "label": "Packages: extract",
+            "label": "$(stop-circle) Docker: Stop Compose Services",
+            "type": "shell",
+            "command": "docker-compose -f docker/docker-compose.yaml down",
+            "detail": "Stops and removes all containers defined in docker-compose.yaml.",
+            "group": "build",
+            "options": {"statusbar": {"hide": true}},
+            "presentation": { "reveal": "never" }
+        },
+        {
+            "label": "$(package) Docker: Build Image",
+            "type": "shell",
+            "command": "docker build -f docker/dockerfile -t taha2samy/mybrocker:${input:imageTag} .",
+            "detail": "Builds a Docker image from the Dockerfile with a custom tag.",
+            "group": "build",
+            "presentation": { "reveal": "always" }
+        },
+        {
+            "label": "$(cloud-upload) Docker: Push Selected Image",
+            "type": "shell",
+            "command": "docker push ${input:selectedImage}",
+            "detail": "Select a local image and push it to the Docker registry.",
+            "group": "build",
+            "options": {"statusbar": {"hide": true}},
+            "presentation": { "reveal": "always" }
+        },
+        // =================================================================
+        // PYTHON & CLIENT TASKS
+        // =================================================================
+        {
+            "label": "$(lock) Python: Freeze Dependencies",
             "type": "shell",
             "command": "pipenv run pip freeze > requirements.txt",
+            "detail": "Exports Pipenv packages to a standard requirements.txt file.",
             "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
+            "options": {"statusbar": {"hide": true}},
+            "presentation": { "reveal": "never" }
         },
-            {
-                "label": "Docker: Run Compose (Detached)",
-                "type": "shell",
-                "command": "docker-compose -f docker/docker-compose.yaml up -d --build",
-                "group": "build",
-                "presentation": {
-                    "reveal": "never",
-                    "panel": "shared",
-                    "focus": false,
-                    "showReuseMessage": false
-                },
-                "problemMatcher": []
-            },
-            {
-                "label": "Docker: Stop Compose",
-                "type": "shell",
-                "command": "docker-compose -f docker/docker-compose.yaml down",
-                "group": "build",
-                "presentation": {
-                    "reveal": "never",
-                    "panel": "shared",
-                    "focus": false,
-                    "showReuseMessage": false
-                },
-                "problemMatcher": []
-            },
-            {
-                "label": "Docker: build",
-                "type": "shell",
-                "command": "docker build -f docker/dockerfile -t taha2samy/mybrocker:${input:userText} ./.",
-                "group": "build",
-                "presentation": {
-                    "reveal": "never",
-                    "panel": "dedicated",
-                    "focus": false,
-                    "showReuseMessage": false
-                },
-                "problemMatcher": []
-            },
-                    {
-            "label": "Docker:$(package) Push Selected Image",
+        {
+            "label": "$(terminal) Client: Run Application",
             "type": "shell",
-            "command": "sudo docker push ${input:selectedImage}",
-            "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared",
-                "focus": false,
-                "showReuseMessage": false
-            },
-            "problemMatcher": []
+            "command": "python client/tkinter/main.py",
+            "detail": "Launches the client application for development and testing.",
+            "group": { "kind": "build", "isDefault": true },
+            "options": {"statusbar": {"hide": true}},
+            "presentation": { "reveal": "always", "panel": "new", "focus": true }
         }
-
-        
     ],
     "inputs": [
         {
-            "id": "userText",
+            "id": "imageTag",
             "type": "promptString",
-            "description": "Type something:",
-            "default": "v1"
+            "description": "Please enter a tag for the Docker image (e.g., v1.2.0)",
+            "default": "latest"
         },
-{
-    "id": "selectedImage",
-    "type": "command",
-    "command": "shellCommand.execute",
-    "args": {
-        "command": "docker images --format '{{.Repository}}:{{.Tag}}|{{.Repository}}:{{.Tag}}|{{.Size}}|{{.CreatedSince}}'",
-        "fieldSeparator": "|",
-        "description": "Select the image to push"
-    }
-}
-
+        {
+            "id": "selectedImage",
+            "type": "command",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "docker images --format '{{.Repository}}:{{.Tag}}|{{.Size}} | {{.CreatedSince}}'",
+                "fieldSeparator": "|",
+                "description": "Select the Docker image to push to the registry"
+            }
+        }
     ]
 }

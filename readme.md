@@ -79,6 +79,7 @@ graph TD
 
 4.  **Run migrations and start the server:**
     ```bash
+    python manage.py collectstatic
     python manage.py migrate
     python manage.py runserver
     ```

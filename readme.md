@@ -3,6 +3,7 @@
 <!-- Badges for style points: e.g., Python version, license -->
 ![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Django Brocker CI/CD](https://github.com/taha2samy/websocket-agent-cluster/actions/workflows/ci.yaml/badge.svg)
 
 A high-performance WebSocket message broker with a dynamic, token-based permission system, built on Django Channels and Redis for real-time security and scalability.
 ```mermaid

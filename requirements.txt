@@ -24,7 +24,6 @@ pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pycparser==2.23
 pyOpenSSL==25.3.0
-
 redis==6.4.0
 service-identity==24.2.0
 sqlparse==0.5.3
@@ -33,5 +32,6 @@ tomli==2.2.1
 Twisted==25.5.0
 txaio==25.6.1
 typing_extensions==4.15.0
+uvicorn==0.37.0
 whitenoise==6.11.0
 zope.interface==8.0

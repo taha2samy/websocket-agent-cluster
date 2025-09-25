@@ -1,14 +1,12 @@
 import sys
 import asyncio
-import json # <-- 1. تم استيراد مكتبة JSON
-import websockets
+import json 
+import websocketsss
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTextEdit, QGroupBox
 )
 from PyQt5.QtCore import QThread, pyqtSignal, QObject
 
-# ------------------ Worker Thread for asyncio ------------------
-# (No changes needed in this class)
 class AsyncWorker(QObject):
     received_message = pyqtSignal(str)
     connected = pyqtSignal()
@@ -53,7 +51,6 @@ class AsyncWorker(QObject):
         if self.websocket:
             asyncio.run_coroutine_threadsafe(self.websocket.close(), self.loop)
 
-# ------------------ Main GUI ------------------
 class WebSocketClientGUI(QWidget):
     def __init__(self):
         super().__init__()

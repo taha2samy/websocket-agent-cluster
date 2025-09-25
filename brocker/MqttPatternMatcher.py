@@ -53,9 +53,7 @@ class MqttPatternMatcher:
         # If no patterns matched after checking the whole list.
         return {"match": False}
 
-# --- Example Usage ---
 if __name__ == "__main__":
-    # Define a list of existing topic patterns (Training Data / Rules)
     existing_patterns = [
         "sensors/+/temperature",
         "alerts/critical/#",
@@ -67,33 +65,26 @@ if __name__ == "__main__":
 
     print("--- Use Cases ---")
 
-    # 1. Topic that matches a single-level wildcard pattern
     topic1 = "sensors/living_room/temperature"
     result1 = matcher.is_match(topic1, existing_patterns)
     print(f"Topic: '{topic1}'\nResult: {result1}\n") # Expected: {'match': True}
 
-    # 2. Topic that matches a multi-level wildcard pattern
     topic2 = "alerts/critical/database/high_latency"
     result2 = matcher.is_match(topic2, existing_patterns)
     print(f"Topic: '{topic2}'\nResult: {result2}\n") # Expected: {'match': True}
 
-    # 3. Topic that does NOT match any pattern
     topic3 = "sensors/living_room/humidity"
     result3 = matcher.is_match(topic3, existing_patterns)
     print(f"Topic: '{topic3}'\nResult: {result3}\n") # Expected: {'match': False}
     
-    # 4. An exact match with a non-wildcard pattern
     topic4 = "system/logs"
     result4 = matcher.is_match(topic4, existing_patterns)
     print(f"Topic: '{topic4}'\nResult: {result4}\n") # Expected: {'match': True}
     
-    # 5. Edge case: A topic that matches the parent level of a multi-level wildcard
-    # The pattern 'alerts/critical/#' should match 'alerts/critical'
     topic5 = "alerts/critical"
     result5 = matcher.is_match(topic5, existing_patterns)
     print(f"Topic: '{topic5}'\nResult: {result5}\n") # Expected: {'match': True}
     
-    # 6. Topic that is a level deeper than a single-level wildcard allows
     topic6 = "devices/bedroom/light/status"
     result6 = matcher.is_match(topic6, existing_patterns)
     print(f"Topic: '{topic6}'\nResult: {result6}\n") # Expected: {'match': False}

@@ -1,5 +1,5 @@
 # Django Real-Time Broker
-
+![logo](img/logo.png)
 <!-- Badges for style points: e.g., Python version, license -->
 ![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)

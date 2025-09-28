@@ -35,3 +35,4 @@ typing_extensions==4.15.0
 uvicorn==0.37.0
 whitenoise==6.11.0
 zope.interface==8.0.1
+setuptools==78.1.1

@@ -110,6 +110,7 @@ jobs:
       - name: Scan image from tarball
         uses: lazy-actions/gitrivy@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}  
           input: 'image.tar'
           format: 'table'
           exit-code: '1'

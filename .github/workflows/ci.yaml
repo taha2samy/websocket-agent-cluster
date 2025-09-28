@@ -69,11 +69,16 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
             
-      - name: Build image and save as tarball for scanning
+      - name: Create a Clean Build Context
+        run: |
+          mkdir clean_context
+          cp -r brocker myproject manage.py requirements.txt docker ./clean_context/
+
+      - name: Build image from clean context and save as tarball
         uses: docker/build-push-action@v4
         with:
-          context: .
-          file: ./docker/dockerfile
+          context: ./clean_context
+          file: ./clean_context/docker/dockerfile
           outputs: type=docker,dest=image.tar
           tags: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
 

@@ -108,7 +108,7 @@ jobs:
           tags: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
 
       - name: Scan image from tarball
-        uses: aquasecurity/trivy-action@v0.20.0
+        uses: aquasecurity/trivy-action@v0.29.0
         with:
           input: 'image.tar'
           format: 'table'

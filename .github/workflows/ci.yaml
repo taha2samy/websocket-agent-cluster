@@ -111,12 +111,11 @@ jobs:
         uses: lazy-actions/gitrivy@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}  
-          input: 'image.tar'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          image: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
+          severity: CRITICAL,HIGH
+          vuln_type: os,library
+          ignore_unfixed: true
+          fail_on_vulnerabilities: true
 
       - name: Build and Push multi-arch image
         if: success()

@@ -2,9 +2,8 @@ FROM python:3.10-slim AS build
 WORKDIR /code
 COPY requirements.txt /code/
 
-RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir --upgrade pip setuptools
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir --upgrade "setuptools>=78.1.1"
 
 COPY . /code/
 

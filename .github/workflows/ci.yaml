@@ -79,15 +79,22 @@ jobs:
       
           trivy image --format json -o "$OUT" "$IMAGE" || true
       
-          TOTAL_HIGH=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="HIGH" or .Severity=="CRITICAL")] | length' "$OUT")
           TOTAL_CRITICAL=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL")] | length' "$OUT")
+          TOTAL_HIGH=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="HIGH")] | length' "$OUT")
+          TOTAL_MEDIUM=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="MEDIUM")] | length' "$OUT")
+          TOTAL_LOW=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="LOW")] | length' "$OUT")
           TOTAL_ALL=$(jq '[.Results[].Vulnerabilities[]?] | length' "$OUT")
       
           echo "## 🔒 Trivy Scan Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Image:** \`$IMAGE\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Total vulnerabilities found:** **$TOTAL_ALL**" >> $GITHUB_STEP_SUMMARY
-          echo "- **HIGH + CRITICAL:** **$TOTAL_HIGH** (CRITICAL: $TOTAL_CRITICAL)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Breakdown by Severity" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔴 **Critical:** $TOTAL_CRITICAL" >> $GITHUB_STEP_SUMMARY
+          echo "- 🟠 **High:** $TOTAL_HIGH" >> $GITHUB_STEP_SUMMARY
+          echo "- 🟡 **Medium:** $TOTAL_MEDIUM" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔵 **Low:** $TOTAL_LOW" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
       
           if [ "$TOTAL_ALL" -eq 0 ]; then
@@ -116,9 +123,6 @@ jobs:
             | .[]' "$OUT" \
           | sed 's/^/ /' \
           >> $GITHUB_STEP_SUMMARY
-      
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "_Full JSON report attached as artifact (if you want detailed traces)._ " >> $GITHUB_STEP_SUMMARY
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

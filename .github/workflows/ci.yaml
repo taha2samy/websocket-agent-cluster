@@ -86,15 +86,67 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Install and Scan Docker image with Trivy
+      - name: Run Trivy and append summary to Actions run summary
         run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
-          export PATH=$PWD/bin:$PATH
-          trivy --version
-          trivy image \
-            --severity HIGH,CRITICAL \
-            --ignore-unfixed \
-            taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
+          # install jq (if not present) and ensure trivy is available
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+      
+          if ! command -v trivy >/dev/null 2>&1; then
+            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+            export PATH=$PWD/bin:$PATH
+          fi
+      
+          IMAGE="taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan"
+          OUT="trivy-report.json"
+      
+          trivy image --format json -o "$OUT" "$IMAGE" || true
+      
+          TOTAL_HIGH=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="HIGH" or .Severity=="CRITICAL")] | length' "$OUT")
+          TOTAL_CRITICAL=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL")] | length' "$OUT")
+          TOTAL_ALL=$(jq '[.Results[].Vulnerabilities[]?] | length' "$OUT")
+      
+          echo "## 🔒 Trivy Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image:** \`$IMAGE\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total vulnerabilities found:** **$TOTAL_ALL**" >> $GITHUB_STEP_SUMMARY
+          echo "- **HIGH + CRITICAL:** **$TOTAL_HIGH** (CRITICAL: $TOTAL_CRITICAL)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+      
+          if [ "$TOTAL_ALL" -eq 0 ]; then
+            echo "No vulnerabilities found ✅" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+      
+          echo "### Top findings (HIGH / CRITICAL)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # produce a top-10 unique vulnerabilities list by severity and occurrences
+          jq -r '
+            [.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH") ] 
+            | group_by(.VulnerabilityID) 
+            | map({
+                id: .[0].VulnerabilityID,
+                severity: .[0].Severity,
+                pkg: (.[0].PkgName // .[0].Target),
+                installed: (.[0].InstalledVersion // "-"),
+                fixed: (.[0].FixedVersion // "n/a"),
+                title: (.[0].Title // .[0].Description // ""),
+                link: ("https://avd.aquasec.com/nvd/" + .[0].VulnerabilityID)
+              })
+            | sort_by(.severity) 
+            | reverse
+            | .[:10]
+            | map("- **\(.id)** (\(.severity)) — `\(.pkg)` — installed: `\(.installed)` — fixed: `\(.fixed)`\n  \n  \(.title)\n  \n  [Details](\(.link))\n")
+            | .[]' "$OUT" \
+          | sed 's/^/ /' \
+          >> $GITHUB_STEP_SUMMARY
+      
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "_Full JSON report attached as artifact (if you want detailed traces)._ " >> $GITHUB_STEP_SUMMARY
+      
+          # upload JSON as artifact so you can download it from the run (optional)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   generate-summary:
     needs: [build-test, prepare-build-context, build-scan-push]
@@ -104,11 +156,14 @@ jobs:
       - run: |
           echo "## 🚀 CI/CD Run Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+  
           echo "### 🧪 Testing Stage" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.build-test.outputs.result }}" == "success" ]]; then
             echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
           else
             echo "- **Status:** ❌ Failure" >> $GITHUB_STEP_SUMMARY
+          fi
+  
           echo "### 🛠️ Prepare Build Context Stage" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.prepare-build-context.outputs.result }}" == "success" ]]; then
             echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
@@ -116,8 +171,11 @@ jobs:
             echo "- **Status:** ❌ Failure" >> $GITHUB_STEP_SUMMARY
           else
             echo "- **Status:** ⚠️ Unknown" >> $GITHUB_STEP_SUMMARY
+          fi
+  
           echo "### 🐳 Build & Scan Stage" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.build-scan-push.outputs.result }}" == "success" ]]; then
             echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
           else
             echo "- **Status:** ❌ Failure" >> $GITHUB_STEP_SUMMARY
+          fi

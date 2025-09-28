@@ -30,12 +30,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
       - name: Run Django tests
         run: |
           python manage.py migrate
           python manage.py test
 
-  docker-build-push:
+  build-scan-push:
     needs: build-test
     runs-on: ubuntu-latest
     environment:
@@ -47,14 +48,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
       - name: Collect Static
         run: python manage.py collectstatic --noinput
 
@@ -64,6 +68,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Determine Docker tag
         id: docker_tag
         run: |
@@ -72,40 +82,65 @@ jobs:
           else
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
-      
-      - name: Build and push Docker image
+
+      - name: Build image for scanning
+        id: build-image-for-scan
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./docker/dockerfile
+          load: true
+          tags: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Scan image for vulnerabilities
+        uses: aquasecurity/trivy-action@0.12.0
+        with:
+          image-ref: 'taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Build and Push multi-arch image
+        if: success()
         uses: docker/build-push-action@v4
         with:
           context: .
           file: ./docker/dockerfile
           push: true
           tags: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}
-
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   generate-summary:
-    needs: [build-test, docker-build-push]
+    needs: [build-test, build-scan-push]
     runs-on: ubuntu-latest
     if: always()
-
     steps:
       - name: Generate Run Summary
         run: |
           echo "## 🚀 CI/CD Run Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          echo "### 🧪 Testing Stage (build-test)" >> $GITHUB_STEP_SUMMARY
+          echo "### 🧪 Testing Stage" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.build-test.outputs.result }}" == "success" ]]; then
             echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
           else
             echo "- **Status:** ❌ Failure" >> $GITHUB_STEP_SUMMARY
           fi
           
-          echo "### 🐳 Docker Build & Push Stage" >> $GITHUB_STEP_SUMMARY
-          if [[ "${{ needs.docker-build-push.outputs.result }}" == "success" ]]; then
+          echo "### 🐳 Docker Build, Scan & Push Stage" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.build-scan-push.outputs.result }}" == "success" ]]; then
             echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
-            echo "- **Image:** \`mydockerhubuser/myapp:${{ needs.docker-build-push.outputs.image_tag }}\`" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ needs.docker-build-push.outputs.result }}" == "failure" ]]; then
-            echo "- **Status:** ❌ Failure" >> $GITHUB_STEP_SUMMARY
+            echo "- **Security Scan:** ✅ Passed" >> $GITHUB_STEP_SUMMARY
+            echo "- **Image:** \`taha2samy/mybrocker:${{ needs.build-scan-push.outputs.image_tag }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **Architectures:** \`linux/amd64\`, \`linux/arm64\`" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.build-scan-push.outputs.result }}" == "failure" ]]; then
+            echo "- **Status:** ❌ Failure (Either in build, scan, or push)" >> $GITHUB_STEP_SUMMARY
           else
             echo "- **Status:** ❔ Skipped (due to test failure)" >> $GITHUB_STEP_SUMMARY
           fi

@@ -18,21 +18,14 @@ jobs:
     outputs:
       result: ${{ job.status }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      
-      - name: Install dependencies
-        run: |
+      - run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Run Django tests
-        run: |
+      - run: |
           python manage.py migrate
           python manage.py test
 
@@ -42,64 +35,45 @@ jobs:
     outputs:
       result: ${{ job.status }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Force clean any tracked artifacts before build
-        run: |
+      - uses: actions/checkout@v3
+      - run: |
           find . -type d -name "*.dist-info" -exec rm -rf {} +
           find . -type d -name "*.egg-info" -exec rm -rf {} +
-
-      - name: Create a Clean Build Context
-        run: |
+      - run: |
           mkdir clean_context
           cp -r brocker myproject manage.py requirements.txt docker ./clean_context/
-      
-      - name: Upload clean build context as artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: build-context-artifact
           path: ./clean_context
-          
+
   build-scan-push:
     needs: prepare-build-context
     runs-on: ubuntu-latest
     environment:
-        name: export docker
-        url: https://hub.docker.com/repository/docker/taha2samy/mybrocker
+      name: export docker
+      url: https://hub.docker.com/repository/docker/taha2samy/mybrocker
     outputs:
       result: ${{ job.status }}
       image_tag: ${{ steps.docker_tag.outputs.tag }}
     steps:
-      - name: Download clean build context artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: build-context-artifact
           path: .
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+      - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Determine Docker tag
-        id: docker_tag
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - id: docker_tag
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
           else
             echo "tag=latest" >> $GITHUB_OUTPUT
-          fi
-          
-      - name: Build and Push multi-arch image
-        uses: docker/build-push-action@v4
+      - uses: docker/build-push-action@v4
         with:
           context: .
           file: ./docker/dockerfile
@@ -109,29 +83,31 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Scan Docker image with Trivy
-        uses: lazy-actions/gitrivy@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          image: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+          trivy --version
 
+      - name: Scan Docker image with Trivy
+        run: |
+          trivy image \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
 
   generate-summary:
     needs: [build-test, prepare-build-context, build-scan-push]
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Generate Run Summary
-        run: |
+      - run: |
           echo "## 🚀 CI/CD Run Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
           echo "### 🧪 Testing Stage" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.build-test.outputs.result }}" == "success" ]]; then
             echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
           else
             echo "- **Status:** ❌ Failure" >> $GITHUB_STEP_SUMMARY
-          
           echo "### 🛠️ Prepare Build Context Stage" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.prepare-build-context.outputs.result }}" == "success" ]]; then
             echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
@@ -139,7 +115,6 @@ jobs:
             echo "- **Status:** ❌ Failure" >> $GITHUB_STEP_SUMMARY
           else
             echo "- **Status:** ⚠️ Unknown" >> $GITHUB_STEP_SUMMARY
-          
           echo "### 🐳 Build & Scan Stage" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.build-scan-push.outputs.result }}" == "success" ]]; then
             echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY

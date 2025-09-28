@@ -108,7 +108,7 @@ jobs:
           tags: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
 
       - name: Scan image from tarball
-        uses: aquasecurity/trivy-action@v0.12.0
+        uses: aquasecurity/trivy-action@0
         with:
           input: 'image.tar'
           format: 'table'
@@ -152,22 +152,4 @@ jobs:
           elif [[ "${{ needs.prepare-build-context.outputs.result }}" == "failure" ]]; then
             echo "- **Status:** ❌ Failure" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Status:** ❔ Skipped" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          echo "### 🐳 Docker Build, Scan & Push Stage" >> $GITHUB_STEP_SUMMARY
-          if [[ "${{ needs.build-scan-push.outputs.result }}" == "success" ]]; then
-            echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
-            echo "- **Security Scan:** ✅ Passed" >> $GITHUB_STEP_SUMMARY
-            echo "- **Image:** \`taha2samy/mybrocker:${{ needs.build-scan-push.outputs.image_tag }}\`" >> $GITHUB_STEP_SUMMARY
-            echo "- **Architectures:** \`linux/amd64\`, \`linux/arm64\`" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ needs.build-scan-push.outputs.result }}" == "failure" ]]; then
-            echo "- **Status:** ❌ Failure (Either in build, scan, or push)" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- **Status:** ❔ Skipped" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "Workflow triggered by **${{ github.actor }}** via **${{ github.event_name }}** event." >> $GITHUB_STEP_SUMMARY
-          echo "You can view the full run details [here](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})." >> $GITHUB_STEP_SUMMARY
+            ec

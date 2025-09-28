@@ -1,11 +1,33 @@
-# Exclude image files
+# Git and Docker metadata
+.git
+.gitignore
+.dockerignore
+Dockerfile
+docker/
 
-# Exclude Pipfile and database files
+# Python build artifacts and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.dist-info/
 
-#database.db
+# Local development database
+db.sqlite3
+database.db
 *.db-journal
+
+# Environment files
+.env
+.venv
+venv/
+env/
+
 .vscode/
 .devcontainer/
+
 client/
-db.sqlite3
-.github/
+
+staticfiles/
+media/

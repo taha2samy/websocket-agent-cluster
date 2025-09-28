@@ -86,14 +86,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Install Trivy
+      - name: Install and Scan Docker image with Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
           export PATH=$PWD/bin:$PATH
           trivy --version
-
-      - name: Scan Docker image with Trivy
-        run: |
           trivy image \
             --severity HIGH,CRITICAL \
             --ignore-unfixed \

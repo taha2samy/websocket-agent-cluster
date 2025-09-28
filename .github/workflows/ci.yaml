@@ -96,7 +96,8 @@ jobs:
             echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
           else
             echo "tag=latest" >> $GITHUB_OUTPUT
-
+          fi
+          
       - name: Build and Push multi-arch image
         uses: docker/build-push-action@v4
         with:

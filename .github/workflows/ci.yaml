@@ -102,10 +102,10 @@ jobs:
             exit 0
           fi
       
-          echo "### Top findings (HIGH / CRITICAL)" >> $GITHUB_STEP_SUMMARY
+          echo "### Top Security Findings (CRITICAL / HIGH / MEDIUM)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           jq -r '
-            [.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH") ] 
+            [.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH" or .Severity=="MEDIUM") ] 
             | group_by(.VulnerabilityID) 
             | map({
                 id: .[0].VulnerabilityID,
@@ -118,7 +118,7 @@ jobs:
               })
             | sort_by(.severity) 
             | reverse
-            | .[:10]
+            | .[:15]
             | map("- **\(.id)** (\(.severity)) — `\(.pkg)` — installed: `\(.installed)` — fixed: `\(.fixed)`\n  \n  \(.title)\n  \n  [Details](\(.link))\n")
             | .[]' "$OUT" \
           | sed 's/^/ /' \

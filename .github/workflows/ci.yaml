@@ -115,7 +115,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           image: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
           trivy_version: latest
-          severity: CRITICAL,HIGH
           vuln_type: os,library
           ignore_unfixed: true
           fail_on_vulnerabilities: true

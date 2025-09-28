@@ -91,8 +91,9 @@ jobs:
           file: ./docker/dockerfile
           load: true
           tags: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: true
+          #cache-from: type=gha
+          #cache-to: type=gha,mode=max
 
       - name: Scan image for vulnerabilities
         uses: aquasecurity/trivy-action@0.12.0

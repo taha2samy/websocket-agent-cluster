@@ -44,6 +44,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Force clean any tracked artifacts before build
+        run: |
+          echo "Searching for and deleting contaminating artifact directories..."
+          find . -type d -name "*.dist-info" -exec rm -rf {} +
+          find . -type d -name "*.egg-info" -exec rm -rf {} +
+          echo "Cleanup complete."
+
       - name: Create a Clean Build Context
         run: |
           mkdir clean_context
@@ -101,7 +108,7 @@ jobs:
           tags: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
 
       - name: Scan image from tarball
-        uses: aquasecurity/trivy-action@0.12.0
+        uses: aquasecurity/trivy-action@v0.12.0
         with:
           input: 'image.tar'
           format: 'table'

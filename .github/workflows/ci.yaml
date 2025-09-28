@@ -34,6 +34,7 @@ jobs:
         run: |
           python manage.py migrate
           python manage.py test
+          
   build-scan-push:
     needs: build-test
     runs-on: ubuntu-latest
@@ -67,19 +68,19 @@ jobs:
           else
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
-      - name: Build image for scanning
-        id: build-image-for-scan
+            
+      - name: Build image and save as tarball for scanning
         uses: docker/build-push-action@v4
         with:
           context: .
           file: ./docker/dockerfile
-          load: true
+          outputs: type=docker,dest=image.tar
           tags: taha2samy/mybrocker:${{ steps.docker_tag.outputs.tag }}-scan
 
-      - name: Scan image for vulnerabilities
+      - name: Scan image from tarball
         uses: aquasecurity/trivy-action@0.12.0
         with:
-          image-ref: 'taha2samy/mybrocker@${{ steps.build-image-for-scan.outputs.digest }}'
+          input: 'image.tar'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true

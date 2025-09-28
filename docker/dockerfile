@@ -1,4 +1,4 @@
-FROM python:3.10-slim AS build
+FROM python:3.12.11-alpine AS build
 WORKDIR /code
 COPY requirements.txt /code/
 
@@ -9,7 +9,7 @@ COPY . /code/
 
 RUN python manage.py collectstatic --noinput
 
-FROM python:3.10-slim AS production
+FROM python:3.12.11-alpine AS production
 WORKDIR /code
 COPY --from=build /usr/local /usr/local
 COPY --from=build /code /code

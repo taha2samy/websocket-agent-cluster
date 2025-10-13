@@ -14,12 +14,12 @@ Django==5.2.7
 django-redis==6.0.0
 h11==0.16.0
 hyperlink==21.0.0
-idna==3.10
+idna==3.11
 incremental==24.7.2
 logger==1.4
-msgpack==1.1.1
+msgpack==1.1.2
 psycopg==3.2.10
-psycopg2-binary==2.9.10
+psycopg2-binary==2.9.11
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pycparser==2.23
@@ -28,7 +28,7 @@ redis==6.4.0
 service-identity==24.2.0
 sqlparse==0.5.3
 tk==0.1.0
-tomli==2.2.1
+tomli==2.3.0
 Twisted==25.5.0
 txaio==25.9.2
 typing_extensions==4.15.0

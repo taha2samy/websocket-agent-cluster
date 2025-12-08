@@ -10,7 +10,7 @@ click==8.3.1
 constantly==23.10.4
 cryptography==46.0.3
 daphne==4.2.1
-Django==5.2.8
+Django==5.2.9
 django-redis==6.0.0
 h11==0.16.0
 hyperlink==21.0.0
@@ -18,7 +18,7 @@ idna==3.11
 incremental==24.11.0
 logger==1.4
 msgpack==1.1.2
-psycopg==3.3.0
+psycopg==3.3.2
 psycopg2-binary==2.9.11
 pyasn1==0.6.1
 pyasn1_modules==0.4.2

@@ -26,13 +26,13 @@ pycparser==2.23
 pyOpenSSL==25.3.0
 redis==6.4.0
 service-identity==24.2.0
-sqlparse==0.5.4
+sqlparse==0.5.5
 tk==0.1.0
 tomli==2.3.0
 Twisted==25.5.0
 txaio==25.9.2
 typing_extensions==4.15.0
-uvicorn==0.38.0
+uvicorn==0.40.0
 whitenoise==6.11.0
 zope.interface==8.1.1
 setuptools==78.1.1

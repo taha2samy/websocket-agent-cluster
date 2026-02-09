@@ -1,4 +1,4 @@
-asgiref==3.11.0
+asgiref==3.11.1
 async-timeout==5.0.1
 attrs==25.4.0
 autobahn==24.4.2
@@ -8,9 +8,9 @@ channels==4.3.2
 channels_redis==4.3.0
 click==8.3.1
 constantly==23.10.4
-cryptography==46.0.3
+cryptography==46.0.4
 daphne==4.2.1
-Django==5.2.10
+Django==5.2.11
 django-redis==6.0.0
 h11==0.16.0
 hyperlink==21.0.0
